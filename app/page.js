@@ -1,4 +1,4 @@
-import NavBar from "@/components/Navbar";
+import NavBar from "@/components/NavBar";
 import TaskManager from "@/components/TaskManager";
 import { ThemeProvider } from "next-themes";
 
