@@ -15,13 +15,13 @@ const DarkModeToggle = () => {
   const currentTheme = theme === "system" ? systemTheme : theme;
 
   return (
-    <div>
+    <div className="bg-white dark:bg-[#1e293b99] rounded-md border border-gray-200 dark:border-gray-700">
       {currentTheme === "dark" ? (
-        <button className="p-2" onClick={() => setTheme("light")}>
+        <button className="py-2 px-2.5" onClick={() => setTheme("light")}>
           <BsSun size={18} className="text-amber-500" />
         </button>
       ) : (
-        <button className="p-2" onClick={() => setTheme("dark")}>
+        <button className="py-2 px-2.5" onClick={() => setTheme("dark")}>
           <BsMoonFill size={18} className="text-gray-500" />
         </button>
       )}

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import DarkModeToggle from "./DarkModeToggle";
+import { v4 as uuidv4 } from "uuid";
 
 const TaskManager = () => {
   const [taskText, setTaskText] = useState("");
@@ -29,34 +29,47 @@ const TaskManager = () => {
 
   const handleAddTask = () => {
     if (taskText.trim() !== "") {
-      setTasks([...tasks, { text: taskText, completed: false }]);
+      const newTask = {
+        id: uuidv4(),
+        text: taskText,
+        completed: false,
+      };
+
+      setTasks([...tasks, newTask]);
       setTaskText("");
     }
   };
 
-  const handleCompleteTask = (indexNum) => {
-    const updatedTasks = [...tasks];
-    updatedTasks[indexNum].completed = true;
+  const handleCompleteTask = (taskId) => {
+    const taskToBeMoved = tasks.find((task) => task.id === taskId);
+    if (!taskToBeMoved) return;
 
-    const completedTask = updatedTasks[indexNum];
-    setTasks(updatedTasks.filter((i) => i !== indexNum));
-    setCompletedTasks([...completedTasks, completedTask]);
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
+
+    const updatedCompletedTasks = [
+      ...completedTasks,
+      { ...taskToBeMoved, completed: true },
+    ];
+    setCompletedTasks(updatedCompletedTasks);
   };
 
-  const RemoveCompleteTask = (indexNum) => {
-    const updatedCompletedTasks = [...completedTasks];
-    updatedCompletedTasks[indexNum].completed = false;
-    const taskToBeMoved = updatedCompletedTasks[indexNum];
-    setTasks([...tasks, taskToBeMoved]);
-    setCompletedTasks(updatedCompletedTasks.filter((i) => i !== indexNum));
+  const handleRestoreTask = (taskId) => {
+    const taskToBeMoved = completedTasks.find((task) => task.id === taskId);
+    if (!taskToBeMoved) return;
+
+    const updatedCompletedTasks = completedTasks.filter(
+      (task) => task.id !== taskId
+    );
+    setCompletedTasks(updatedCompletedTasks);
+
+    const updatedTasks = [...tasks, { ...taskToBeMoved, completed: false }];
+    setTasks(updatedTasks);
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="rounded-xl  bg-[#1e293b99] shadow-1 border-general border border-gray-300 dark:border-gray-600 p-8 mb-8">
-        <DarkModeToggle />
-      </div>
-      <div className="rounded-xl bg-white dark:bg-[#1e293b99] shadow-sm border border-gray-300 dark:border-gray-600 p-8 mb-8">
+    <div>
+      <div className="rounded-xl bg-white dark:bg-[#1e293b99] border border-gray-200 dark:border-gray-600 p-8 mb-8">
         <div className="flex justify-center">
           <input
             type="text"
@@ -74,31 +87,21 @@ const TaskManager = () => {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-10">
-        <div className="rounded-xl bg-white  dark:bg-[#1e293b99] shadow-1 border-general border border-gray-300 dark:border-gray-600 p-8">
+        <div className="rounded-xl bg-white  dark:bg-[#1e293b99] border-general border border-gray-200 dark:border-gray-600 p-8">
           <h2 className="text-xl text-black dark:text-white font-bold mb-2">
             Tasks
           </h2>
           {tasks.length > 0 ? (
             <ul className="text-lg list-none text-[#94a3b8]">
-              {tasks.map((task, index) => (
-                <li key={index}>
-                  <div class="flex items-center">
-                    <input
-                      onChange={() => handleCompleteTask(index)}
-                      id="default-radio-2"
-                      type="radio"
-                      value=""
-                      name="default-radio"
-                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                    />
-                    <label
-                      for="default-radio-2"
-                      class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                    >
-                      {" "}
-                      {task.text}
-                    </label>
-                  </div>
+              {tasks.map((task) => (
+                <li key={task.id}>
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={task.completed}
+                    onChange={() => handleCompleteTask(task.id)}
+                  />
+                  {task.text}
                 </li>
               ))}
             </ul>
@@ -107,16 +110,19 @@ const TaskManager = () => {
           )}
         </div>
 
-        <div className="rounded-xl  bg-[#1e293b99] shadow-1 border-general border border-gray-300 p-8">
-          <h2 className="text-xl text-white font-bold mb-2">Completed Tasks</h2>
+        <div className="rounded-xl bg-white  dark:bg-[#1e293b99] border-general border border-gray-200 dark:border-gray-600 p-8">
+          <h2 className="text-xl text-black dark:text-white font-bold mb-2">
+            Completed Tasks
+          </h2>
           {completedTasks.length > 0 ? (
             <ul className="text-lg list-none text-[#94a3b8]">
-              {completedTasks.map((task, index) => (
-                <li key={index}>
+              {completedTasks.map((task) => (
+                <li key={task.id}>
                   <input
-                    type="radio"
+                    type="checkbox"
+                    checked={task.completed}
                     className="mr-2"
-                    onChange={() => RemoveCompleteTask(index)}
+                    onChange={() => handleRestoreTask(task.id)}
                   />
                   {task.text}
                 </li>
