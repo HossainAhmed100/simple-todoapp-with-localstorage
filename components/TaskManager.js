@@ -82,7 +82,7 @@ const TaskManager = () => {
             className="bg-blue-500 text-white rounded px-8 py-2"
             onClick={handleAddTask}
           >
-            Add Task
+            Add a new Task
           </button>
         </div>
       </div>
